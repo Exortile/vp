@@ -1,15 +1,24 @@
 <?php
 
+session_start();
+
+// kontrollin, kas oleme sisse loginud
+if (!isset($_SESSION["user_id"])) {
+	header("Location: page.php");
+	exit();
+}
+
+// logime välja
+if (isset($_GET["logout"])) {
+	session_destroy();
+	header("Location: page.php");
+	exit();
+}
+
+require_once "header.php";
+
 ?>
-<!DOCTYPE html>
-<html lang="et">
-<head>
-	<meta charset="utf-8">
-	<title>Home</title>
-</head>
-<body>
-	<img src="pics/vp_banner_gs.png" alt="bänner">
-	<p>See leht on loodud õppetöö raames ja ei sisalda tõsiseltvõetavat sisu!</p>
-	<p>Õppetöö toimus <a href="https://www.tlu.ee" target="_blank">Tallinna Ülikoolis</a> Digitehnoloogiate instituudis.</p>
-</body>
-</html>
+<ul>
+	<li><a href="?logout=1">Logi välja</a></li>
+</ul>
+<?php require_once "footer.php"; ?>
