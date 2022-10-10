@@ -144,6 +144,50 @@
 		}
 	}
 
+	$login_error = null;
+	$email = null;
+	$password = null;
+	$password_db = null;
+
+	if ($_SERVER["REQUEST_METHOD"] == "POST" and isset($_POST["user_login_submit"])) {
+		$email = $_POST["login_email_input"];
+		$password = $_POST["login_password_input"];
+
+		// loon andmebaasiga uhenduse
+		// server, kasutaja, parool, andmebaas
+		$db_connection = new mysqli($server_host, $server_user_name, $server_password, $database);
+
+		// maaran suhtlemisel kasutatava kooditabeli
+		$db_connection->set_charset("utf8");
+
+		// valmistame ette andmete saatmise SQL käsu
+		$stmt = $db_connection->prepare("SELECT password FROM vp_users WHERE email = ?");
+		echo $db_connection->error;
+
+		// seome SQL käsu oigete andmetega
+		// andmetüübid: i - integer, d - decimal, s - string
+		$stmt->bind_param("s", $email);
+		$stmt->bind_result($password_db);
+		$stmt->execute();
+
+		if ($stmt->fetch()) {
+			if (password_verify($password, $password_db)) {
+				// sulgeme käsu
+				$stmt->close();
+				// sulgeme andmebaasi uhenduse
+				$db_connection->close();
+				header("Location: home.php");
+			} else {
+				$login_error = "Sisselogimine ebaonnestus!";
+			}
+		}
+		// sulgeme käsu
+		$stmt->close();
+
+		// sulgeme andmebaasi uhenduse
+		$db_connection->close();
+	}
+
 ?>
 <!DOCTYPE html>
 <html lang="et">
@@ -163,6 +207,19 @@
 	<p>Semestri pikkus on <?php echo $semester_duration_days;?> päeva. See on kestnud juba <?php echo $from_semester_begin_days; ?> päeva.</p>
 	<img src="pics/tlu_15.jpg" alt="Tallinna Ülikooli sisemuse pilt">
 
+	<hr>
+
+	<form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+		<label for="login_email_input">E-mail (kasutajatunnus):</label><br>
+	  	<input type="email" name="login_email_input" id="login_email_input" value="<?php echo $email; ?>"><br>
+	  	<label for="login_password_input">Salasõna:</label><br>
+	  	<input name="login_password_input" id="login_password_input" type="password"><br>
+		<input name="user_login_submit" type="submit" value="Sisene">
+		<span><?php echo $login_error; ?></span>
+	</form>
+
+	<hr>
+	
 	<hr>
 
 	<form method="POST">
