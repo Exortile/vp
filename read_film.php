@@ -1,6 +1,21 @@
 <?php
     require_once "../../config.php";
 
+    session_start();
+
+    // kontrollin, kas oleme sisse loginud
+    if (!isset($_SESSION["user_id"])) {
+        header("Location: page.php");
+        exit();
+    }
+
+    // logime välja
+    if (isset($_GET["logout"])) {
+        session_destroy();
+        header("Location: page.php");
+        exit();
+    }
+
     // loon andmebaasiga uhenduse
     // server, kasutaja, parool, andmebaas
     $db_connection = new mysqli($server_host, $server_user_name, $server_password, $database);
@@ -61,6 +76,10 @@
 
 <img src="pics/vp_banner_gs.png" alt="bänner">
 <?php echo $film_html; ?>
+
+<ul>
+	<li><a href="?logout=1">Logi välja</a></li>
+</ul>
 
 </body>
 

@@ -1,6 +1,21 @@
 <?php
     require_once "../../config.php";
 
+    session_start();
+
+    // kontrollin, kas oleme sisse loginud
+    if (!isset($_SESSION["user_id"])) {
+        header("Location: page.php");
+        exit();
+    }
+
+    // logime välja
+    if (isset($_GET["logout"])) {
+        session_destroy();
+        header("Location: page.php");
+        exit();
+    }
+
     $error = false;
     $pealkiri_error = null;
     $aasta_error = null;
@@ -130,6 +145,10 @@
     <br>
     <input type="submit" name="film_submit" value="Salvesta">
 </form>
+
+<ul>
+	<li><a href="?logout=1">Logi välja</a></li>
+</ul>
 
 </body>
 
