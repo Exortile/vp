@@ -1,5 +1,6 @@
 <?php
     require_once "../../config.php";
+    require_once "fnc_general.php";
     // kõik muutujad, mis deklareeritud väljaspool funktsiooni, on globaalsed ja kättesaadavad massiivist $GLOBALS
     
     function sign_up($first_name, $last_name, $birth_date, $gender, $email, $password) {
@@ -7,10 +8,7 @@
         
         // loon andmebaasiga uhenduse
         // server, kasutaja, parool, andmebaas
-        $db_connection = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
-
-        // maaran suhtlemisel kasutatava kooditabeli
-        $db_connection->set_charset("utf8");
+        $db_connection = connect_db();
 
         $checkstmt = $db_connection->prepare("SELECT id FROM vp_users WHERE email = ?");
         echo $db_connection->error;
@@ -55,10 +53,7 @@
         $login_success = false;
 		// loon andmebaasiga uhenduse
 		// server, kasutaja, parool, andmebaas
-		$db_connection = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
-
-		// maaran suhtlemisel kasutatava kooditabeli
-		$db_connection->set_charset("utf8");
+		$db_connection = connect_db();
 
 		// valmistame ette andmete saatmise SQL käsu
 		$stmt = $db_connection->prepare("SELECT password FROM vp_users WHERE email = ?");

@@ -1,5 +1,6 @@
 <?php
     require_once "../../config.php";
+    require_once "fnc_general.php";
 
     session_start();
 
@@ -18,10 +19,7 @@
 
     // loon andmebaasiga uhenduse
     // server, kasutaja, parool, andmebaas
-    $db_connection = new mysqli($server_host, $server_user_name, $server_password, $database);
-
-    // maaran suhtlemisel kasutatava kooditabeli
-    $db_connection->set_charset("utf8");
+    $db_connection = connect_db();
 
     // valmistame ette andmete saatmise SQL käsu
     $stmt = $db_connection->prepare("SELECT pealkiri, aasta, kestus, zanr, tootja, lavastaja FROM film");

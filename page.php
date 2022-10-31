@@ -2,7 +2,7 @@
 	session_start();
 	require_once "../../config.php";
 	require_once "fnc_user.php";
-
+	require_once "fnc_general.php";
 
 	$author_name = "Sten-Kristjan Prantsu";
 	$full_time_now = date("d.m.Y H:i:s");
@@ -123,10 +123,7 @@
 		if (empty($comment_error)) {
 			// loon andmebaasiga uhenduse
 			// server, kasutaja, parool, andmebaas
-			$db_connection = new mysqli($server_host, $server_user_name, $server_password, $database);
-
-			// maaran suhtlemisel kasutatava kooditabeli
-			$db_connection->set_charset("utf8");
+			$db_connection = connect_db();
 
 			// valmistame ette andmete saatmise SQL käsu
 			$stmt = $db_connection->prepare("INSERT INTO vp_daycomment (comment, grade) VALUES (?, ?)");

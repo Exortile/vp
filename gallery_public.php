@@ -1,6 +1,7 @@
 <?php
 
 require_once "../../config.php";
+require_once "fnc_general.php";
 
 session_start();
 
@@ -17,16 +18,13 @@ if (isset($_GET["logout"])) {
 	exit();
 }
 
-$db_connection = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
+$db_connection = connect_db();
 
-// maaran suhtlemisel kasutatava kooditabeli
-$db_connection->set_charset("utf8");
-
-$stmt = $db_connection->prepare("SELECT filename, alttext FROM vp_photos WHERE privacy >= 2 AND deleted IS NULL");
+$stmt = $db_connection->prepare("SELECT vp_photos.filename, vp_photos.alttext, vp_users.firstname, vp_users.lastname FROM vp_photos JOIN vp_users ON vp_photos.userid = vp_users.id WHERE vp_photos.privacy >= 2 AND vp_photos.deleted IS NULL GROUP BY vp_photos.id");
 echo $db_connection->error;
 
 # $stmt->bind_param("i", 2);
-$stmt->bind_result($filename_db, $alttext_db);
+$stmt->bind_result($filename_db, $alttext_db, $firstname_db, $lastname_db);
 $stmt->execute();
 
 $img_html = null;
@@ -40,13 +38,13 @@ while ($stmt->fetch()) {
     }
 
     $img_html .= '<img src="' .$normal_upload_location .$filename_db .'" alt="' .$alttext .'">';
-    $img_html .= "<br>\n";
+    $img_html .= "\n";
+    $img_html .= "<p>Üles laadis: " .$firstname_db ." " .$lastname_db ."</p>\n";
 
 }
 
-
-
-
+$stmt->close();
+$db_connection->close();
 
 require_once "header.php";
 
