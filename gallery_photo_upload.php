@@ -1,6 +1,7 @@
 <?php
 
 require_once "fnc_photo_upload.php";
+require_once "../../config.php";
 
 session_start();
 
@@ -51,11 +52,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" and isset($_POST["photo_submit"])
 
 		// muudame pildi suurust
 		$normal_foto = resize_photo($temp_photo, $normal_photo_max_w, $normal_photo_max_h);
+		$thumbnail_photo = resize_photo_thumbnail($temp_photo);
 
-		save_photo($normal_foto, "photo_upload_normal/" .$photo_file_name, $file_type);
+		if (save_photo($normal_foto, $GLOBALS["normal_upload_location"] .$photo_file_name, $file_type)) {
+			if (save_photo($thumbnail_photo, $GLOBALS["thumbnail_upload_location"] .$photo_file_name, $file_type)) {
+				// ajutine fail: $_FILES["photo_input"]["tmp_name"]
+				if (move_uploaded_file($_FILES["photo_input"]["tmp_name"], $GLOBALS["original_upload_location"] .$photo_file_name)) {
+					$db_connection = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
 
-		// ajutine fail: $_FILES["photo_input"]["tmp_name"]
-		move_uploaded_file($_FILES["photo_input"]["tmp_name"], "photo_upload_original/" .$photo_file_name);
+					// maaran suhtlemisel kasutatava kooditabeli
+					$db_connection->set_charset("utf8");
+
+					$stmt = $db_connection->prepare("INSERT INTO vp_photos (userid, filename, alttext, privacy) VALUES (?, ?, ?, ?)");
+					echo $db_connection->error;
+
+					$stmt->bind_param("issi", $_SESSION["user_id"], $photo_file_name, $_POST["alt_input"], $_POST["privacy_input"]);
+					$stmt->execute();
+					
+					$stmt->close();
+					$db_connection->close();
+				}
+			}
+		}
 	}
 }
 

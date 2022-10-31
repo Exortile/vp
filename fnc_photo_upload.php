@@ -57,14 +57,27 @@ function resize_photo($temp_photo, $normal_photo_max_w, $normal_photo_max_h) {
     return $temp_image;
 }
 
+function resize_photo_thumbnail($temp_photo) {
+    $image_w = imagesx($temp_photo);
+    $image_h = imagesy($temp_photo);
+    $temp_image = imagecreatetruecolor(100, 100);
+    imagecopyresampled($temp_image, $temp_photo, 0, 0, 0, 0, 100, 100, $image_w, $image_h);
+
+    return $temp_image;
+}
+
 function save_photo($image, $target, $file_type) {
+    $is_saved = false;
+    
     if ($file_type == "jpg") {
-        imagejpeg($image, $target, 95);
+        $is_saved = imagejpeg($image, $target, 95);
     } else if ($file_type == "png") {
-        imagepng($image, $target, 6);
+        $is_saved = imagepng($image, $target, 6);
     } else if ($file_type == "gif") {
-        imagegif($image, $target);
+        $is_saved = imagegif($image, $target);
     }
+
+    return $is_saved;
 }
 
 ?>
