@@ -56,7 +56,7 @@ $db_connection->close();
 $privacy = 2;
 $page = 1;
 $limit = 4;
-$photo_count = count_photos($privacy);
+$photo_count = count_own_photos();
 
 // kontrollime, mis lehel oleme ja kas selle numbriga leht on reaalne
 if (!isset($_GET["page"]) or $_GET["page"] < 1) {
@@ -83,6 +83,8 @@ $nimi_html = "<p>Sisse logitud: " .$_SESSION["firstname"] ." " .$_SESSION["lastn
 	<li><a href="home.php">Avalehele</a></li>
 </ul>
 
+<h2>Minu oma pildid</h2>
+
 <hr>
 
 <p>
@@ -104,7 +106,7 @@ $nimi_html = "<p>Sisse logitud: " .$_SESSION["firstname"] ." " .$_SESSION["lastn
 </p>
 
 <div class="gallery">
-    <?php echo read_public_photo_thumbs($privacy, $page, $limit); ?>
+    <?php echo read_own_photo_thumbs($page, $limit); ?>
 </div>
 
 <?php require_once "footer.php"; ?>
