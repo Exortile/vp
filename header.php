@@ -5,9 +5,11 @@
 	<title>Veebisüsteem</title>
 	<?php 
 		if (isset($style_sheets)) {
-			echo '<link rel="stylesheet" href="';
-			echo $style_sheets;
-			echo '">' ."\n";
+			foreach ($style_sheets as $style_sheet) {
+				echo '<link rel="stylesheet" href="';
+				echo $style_sheet;
+				echo '">' ."\n";
+			}
 		}
 	?>
 </head>
