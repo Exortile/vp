@@ -3,6 +3,7 @@
 	require_once "../../config.php";
 	require_once "fnc_user.php";
 	require_once "fnc_general.php";
+	require_once "fnc_gallery.php";
 
 	$author_name = "Sten-Kristjan Prantsu";
 	$full_time_now = date("d.m.Y H:i:s");
@@ -196,6 +197,9 @@
 
 	<hr>
 	
+	<p>Kõige uuem üles laetud avalik foto:</p>
+	<?php echo read_latest_public_photo(); ?>
+
 	<hr>
 
 	<form method="POST">

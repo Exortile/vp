@@ -67,6 +67,8 @@ if (!isset($_GET["page"]) or $_GET["page"] < 1) {
     $page = $_GET["page"];
 }
 
+$_SESSION["page"] = $page;
+
 $style_sheets = ["style/gallery.css"];
 
 require_once "header.php";

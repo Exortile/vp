@@ -3,7 +3,6 @@
 require_once "fnc_photo_upload.php";
 require_once "fnc_general.php";
 require_once "../../config.php";
-require_once "classes/Photoupload.class.php";
 
 session_start();
 
@@ -31,27 +30,6 @@ $normal_photo_max_h = 450;
 if ($_SERVER["REQUEST_METHOD"] == "POST" and isset($_POST["photo_submit"]) 
 	and isset($_FILES["photo_input"]["tmp_name"]) and !empty($_FILES["photo_input"]["tmp_name"])) {
 	
-	$photo = new Photoupload($_FILES["photo_input"]);
-	$photo->create_image();
-	$photo->resize_photos();
-	$photo->save_photos($GLOBALS["normal_upload_location"], $GLOBALS["thumbnail_upload_location"], $GLOBALS["original_upload_location"]);
-
-	$photo_error = $photo->error;
-
-	if (empty($photo_error)) {
-		$db_connection = connect_db();
-
-		$stmt = $db_connection->prepare("INSERT INTO vp_photos (userid, filename, alttext, privacy) VALUES (?, ?, ?, ?)");
-		echo $db_connection->error;
-
-		$stmt->bind_param("issi", $_SESSION["user_id"], $photo->filename, $_POST["alt_input"], $_POST["privacy_input"]);
-		$stmt->execute();
-		
-		$stmt->close();
-		$db_connection->close();
-	}
-
-	/*
 	// kontrollime kas on sobilik
 	$file_type = check_file_type($_FILES["photo_input"]["tmp_name"]);
 	if ($file_type == "maasikas") {
@@ -95,7 +73,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" and isset($_POST["photo_submit"])
 			}
 		}
 	}
-	*/
 }
 
 require_once "header.php";

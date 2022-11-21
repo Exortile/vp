@@ -110,3 +110,37 @@ function read_own_photo_thumbs($page, $limit) {
 
     return $img_html;
 }
+
+function read_latest_public_photo() {
+    $privacy = 3; // avalik foto
+    $limit = 1; // uks pilt
+    
+    $db_connection = connect_db();
+
+    $stmt = $db_connection->prepare("SELECT vp_photos.filename, vp_photos.alttext, vp_users.firstname, vp_users.lastname FROM vp_photos JOIN vp_users ON vp_photos.userid = vp_users.id WHERE vp_photos.privacy >= ? AND vp_photos.deleted IS NULL GROUP BY vp_photos.id ORDER BY vp_photos.id DESC LIMIT ?");
+    echo $db_connection->error;
+
+    $stmt->bind_param("ii", $privacy, $limit);
+    $stmt->bind_result($filename_db, $alttext_db, $firstname_db, $lastname_db);
+    $stmt->execute();
+
+    $img_html = null;
+
+    if ($stmt->fetch()) {
+        # <img src="pildi url" alt="alteranatiivtekst">
+
+        if (empty($alttext_db)) {
+            $alttext = "Galeriipilt";
+        } else {
+            $alttext = $alttext_db;
+        }
+
+        $img_html .= '<img src="' .$GLOBALS["normal_upload_location"] .$filename_db .'" alt="' .$alttext .'">' ."\n";
+        $img_html .= "<p>" .$firstname_db ." " .$lastname_db ."</p>\n";
+    }
+
+    $stmt->close();
+    $db_connection->close();
+
+    return $img_html;
+}

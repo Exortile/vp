@@ -22,21 +22,23 @@ if (isset($_GET["logout"])) {
 $photo_error = null;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" and isset($_POST["photo_submit"])) {
+	// foto muutmine
 	$alt = $_POST["alt_input"];
 	$privacy = $_POST["privacy_input"];
 	$photo_id = $_POST["photo_input"];
 
 	if (!modify_own_photo_data($alt, $privacy, $photo_id, $_SESSION["user_id"])) {
-		header("Location: gallery_own.php");
+		header("Location: gallery_own.php?page=" .$_SESSION["page"]);
 	} else {
 		header("Location: edit_photo_data.php?id=" .$photo_id);
 	}
 } 
 else if ($_SERVER["REQUEST_METHOD"] == "POST" and isset($_POST["photo_delete"])) {
+	// foto kustutamine
 	$photo_id = $_POST["photo_input"];
 
 	if (!delete_own_photo($photo_id, $_SESSION["user_id"])) {
-		header("Location: gallery_own.php");
+		header("Location: gallery_own.php?page=" .$_SESSION["page"]);
 	} else {
 		header("Location: photo_deleted.php");
 	}
@@ -47,7 +49,7 @@ if (isset($_GET["id"]) and !empty($_GET["id"]) and filter_var($_GET["id"], FILTE
 	$alt = $photo_data["alt"];
 	$privacy = $photo_data["privacy"];
 } else {
-	header("Location: gallery_own.php");
+	header("Location: gallery_own.php?page=" .$_SESSION["page"]);
 }
 
 require_once "header.php";
@@ -62,6 +64,7 @@ $nimi_html = "<p>Sisse logitud: " .$_SESSION["firstname"] ." " .$_SESSION["lastn
 <ul>
 	<li><a href="?logout=1">Logi välja</a></li>
 	<li><a href="home.php">Avalehele</a></li>
+	<li><a href="gallery_own.php?page=<?php echo $_SESSION["page"]; ?>">Tagasi oma fotode lapangule</a></li>
 </ul>
 
 <hr>

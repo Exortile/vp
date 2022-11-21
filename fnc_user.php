@@ -1,6 +1,7 @@
 <?php
     require_once "../../config.php";
     require_once "fnc_general.php";
+    require_once "fnc_user_profile.php";
     // kõik muutujad, mis deklareeritud väljaspool funktsiooni, on globaalsed ja kättesaadavad massiivist $GLOBALS
     
     function sign_up($first_name, $last_name, $birth_date, $gender, $email, $password) {
@@ -88,6 +89,11 @@
                 $_SESSION["user_id"] = $id_db;
                 $_SESSION["firstname"] = $firstname_db;
                 $_SESSION["lastname"] = $lastname_db;
+
+                // lisame natuke lehe välimust
+                $user_profile_data = read_user_profile($id_db);
+                $_SESSION["user_bg_color"] = $user_profile_data["bgcolor"];
+                $_SESSION["user_txt_color"] = $user_profile_data["txtcolor"];
             }
 
             $stmt->close();
