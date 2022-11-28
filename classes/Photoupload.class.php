@@ -4,9 +4,9 @@ class Photoupload {
     private $photo;
     private $image_type;
     private $temp_image;
-    private $photo_file_size_limit = 1.5 * 1024 * 1024;
+    public $photo_file_size_limit = 1.5 * 1024 * 1024;
 
-    public $filename;
+    public $filename = null;
     public $thumbnail_photo;
     public $normal_photo;
 
@@ -21,12 +21,6 @@ class Photoupload {
     function __construct($photo) {
         $this->photo = $photo;
         $this->check_file_type();
-
-        if (empty($this->error)) {
-            if ($this->photo["size"] >= $this->photo_file_size_limit) {
-                $this->error = "Valitud fail on liiga suur!";
-            }
-        }
     }
 
     function __destruct() {
@@ -46,15 +40,39 @@ class Photoupload {
                 $this->image_type = "png";
             } else if ($image_check["mime"] == "image/gif") {
                 $this->image_type = "gif";
+            } else {
+                $this->error = "Tegemist pole veebis kasutatava failitüübiga!";
             }
         }
     
-        if ($this->image_type == "maasikas") {
-            $this->error = "Valitud fail pole sobivat tüüpi!";
+        if (empty($this->error) and $this->image_type == "maasikas") {
+            $this->error = "See pole pildifail!";
+        }
+    }
+
+    public function check_allowed_type($allowed_types) {
+        $error = null;
+        $image_check = getimagesize($this->photo["tmp_name"]);
+    
+        if ($image_check) {
+            if (!in_array($image_check["mime"], $allowed_types)) {
+                $error = "Valitud fail pole sobivat tüüpi!";
+            }
+        }
+
+        $this->error = $error;
+        return $error;
+    }
+
+    public function check_size() {
+        if (!empty($this->error)) return;
+
+        if ($this->photo["size"] >= $this->photo_file_size_limit) {
+            $this->error = "Valitud fail on liiga suur!";
         }
     }
     
-    private function create_filename() {
+    public function create_filename() {
         $timestamp = microtime(1) * 10000;
         $this->filename = $this->photo_name_prefix .$timestamp ."." .$this->image_type;
     }
@@ -75,8 +93,6 @@ class Photoupload {
         if (empty($this->temp_image)) {
             $this->error = "Pildi loomisel läks midagi valesti.";
         }
-
-        $this->create_filename();
     }
     
     public function resize_photos() {
@@ -132,15 +148,25 @@ class Photoupload {
 
         $is_normal_saved = false;
         $is_thumbnail_saved = false;
+
+        if ($thumbnail_target == null) {
+            $is_thumbnail_saved = true;
+        }
         
         if ($this->image_type == "jpg") {
             $is_normal_saved = imagejpeg($this->normal_photo, $normal_target .$this->filename, 95);
+
+            if (!$is_thumbnail_saved)
             $is_thumbnail_saved = imagejpeg($this->thumbnail_photo, $thumbnail_target .$this->filename, 95);
         } else if ($this->image_type == "png") {
             $is_normal_saved = imagepng($this->normal_photo, $normal_target .$this->filename, 6);
+
+            if (!$is_thumbnail_saved)
             $is_thumbnail_saved = imagepng($this->thumbnail_photo, $thumbnail_target .$this->filename, 6);
         } else if ($this->image_type == "gif") {
             $is_normal_saved = imagegif($this->normal_photo, $normal_target .$this->filename);
+
+            if (!$is_thumbnail_saved)
             $is_thumbnail_saved = imagegif($this->thumbnail_photo, $thumbnail_target .$this->filename);
         }
 

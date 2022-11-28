@@ -4,7 +4,9 @@ require_once "../../config.php";
 require_once "fnc_general.php";
 require_once "fnc_gallery.php";
 
-session_start();
+//session_start();
+require_once "classes/SessionManager.class.php";
+SessionManager::sessionStart("vp", 0, "/~pransten/vp/", "greeny.cs.tlu.ee");
 
 // kontrollin, kas oleme sisse loginud
 if (!isset($_SESSION["user_id"])) {

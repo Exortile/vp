@@ -37,23 +37,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" and isset($_POST["photo_submit"])
 	$photo->check_size();
 	$photo->create_image();
 	$photo->create_filename();
+	$photo->normal_photo_max_h = 300;
+	$photo->normal_photo_max_w = 300;
 	$photo->resize_photos();
-	$photo->save_photos($GLOBALS["normal_upload_location"], $GLOBALS["thumbnail_upload_location"], $GLOBALS["original_upload_location"]);
+	$photo->save_photos($GLOBALS["profile_photo_upload_location"], null, $GLOBALS["original_upload_location"]);
 
 	$photo_error = $photo->error;
 
 	if (empty($photo_error)) {
 		$photo_error = "Fail edukalt üles laetud!";
-
-		$alt = test_input($_POST["alt_input"]);
-		$privacy = filter_var($_POST["privacy_input"], FILTER_VALIDATE_INT);
+		$userid = $_SESSION["user_id"];
 
 		$db_connection = connect_db();
 
-		$stmt = $db_connection->prepare("INSERT INTO vp_photos (userid, filename, alttext, privacy) VALUES (?, ?, ?, ?)");
+		$stmt = $db_connection->prepare("SELECT filename FROM vp_userprofilephotos WHERE userid = ?");
 		echo $db_connection->error;
 
-		$stmt->bind_param("issi", $_SESSION["user_id"], $photo->filename, $alt, $privacy);
+		$stmt->bind_param("i", $userid);
+		$stmt->bind_result($filename_db);
+		$stmt->execute();
+
+		if ($stmt->fetch()) {
+			$stmt->close();
+
+			$stmt = $db_connection->prepare("UPDATE vp_userprofilephotos SET filename = ? WHERE userid = ?");
+			echo $db_connection->error;
+		} else {
+			$stmt->close();
+
+			$stmt = $db_connection->prepare("INSERT INTO vp_userprofilephotos (filename, userid) VALUES (?, ?)");
+			echo $db_connection->error;
+		}
+
+		$stmt->bind_param("si", $photo->filename, $userid);
 		$stmt->execute();
 		
 		$stmt->close();
@@ -109,8 +125,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" and isset($_POST["photo_submit"])
 	*/
 }
 
-$javascripts = ["javascript/check_file_size.js"];
-
 require_once "header.php";
 
 $nimi_html = "<p>Sisse logitud: " .$_SESSION["firstname"] ." " .$_SESSION["lastname"] ."</p>";
@@ -131,20 +145,8 @@ $nimi_html = "<p>Sisse logitud: " .$_SESSION["firstname"] ." " .$_SESSION["lastn
 	<label for="photo_input">Vali pildifail:</label>
 	<input type="file" name="photo_input" id="photo_input">
 	<br>
-	<label for="alt_input">Alternatiivtekst (alt):</label>
-	<input type="text" name="alt_input" id="alt_input" placeholder="alternatiivtekst ...">
-	<br>
-	<input type="radio" name="privacy_input" id="privacy_input_1" value="1">
-	<label for="privacy_input_1">Privaatne (ainult ise näen)</label>
-	<br>
-	<input type="radio" name="privacy_input" id="privacy_input_2" value="2">
-	<label for="privacy_input_2">Sisse loginud kasutajatele</label>
-	<br>
-	<input type="radio" name="privacy_input" id="privacy_input_3" value="3">
-	<label for="privacy_input_3">Avalik (kõik näevad)</label>
-	<br>
 	<input type="submit" name="photo_submit" id="photo_submit" value="Lae üles">
-	<span id="errorPlace"><?php echo $photo_error; ?></span>
+	<span><?php echo $photo_error; ?></span>
 </form>
 
 <?php require_once "footer.php"; ?>

@@ -10,11 +10,22 @@
 		}
 	</style>
 	<?php 
-		if (isset($style_sheets)) {
+		if (isset($style_sheets) and !empty($style_sheets)) {
 			foreach ($style_sheets as $style_sheet) {
 				echo '<link rel="stylesheet" href="';
 				echo $style_sheet;
 				echo '">' ."\n";
+			}
+		}
+
+		// javascripti jaoks
+		// <script src="javascript/check_file_size.js" defer></script>
+
+		if (isset($javascripts) and !empty($javascripts)) {
+			foreach ($javascripts as $javascript) {
+				echo '<script src="';
+				echo $javascript;
+				echo '" defer></script>' ."\n";
 			}
 		}
 	?>
