@@ -41,17 +41,17 @@ function read_public_photo_thumbs($privacy, $page, $limit) {
 
     # LIMIT x - mitu naidata
     # LIMIT x,y - mitu vahele jätta, mitu näidata
-    $stmt = $db_connection->prepare("SELECT vp_photos.filename, vp_photos.alttext, vp_users.firstname, vp_users.lastname FROM vp_photos JOIN vp_users ON vp_photos.userid = vp_users.id WHERE vp_photos.privacy >= ? AND vp_photos.deleted IS NULL GROUP BY vp_photos.id ORDER BY vp_photos.id DESC LIMIT ?,?");
+    $stmt = $db_connection->prepare("SELECT vp_photos.id, vp_photos.filename, vp_photos.alttext, vp_users.firstname, vp_users.lastname FROM vp_photos JOIN vp_users ON vp_photos.userid = vp_users.id WHERE vp_photos.privacy >= ? AND vp_photos.deleted IS NULL GROUP BY vp_photos.id ORDER BY vp_photos.id DESC LIMIT ?,?");
     echo $db_connection->error;
 
     $stmt->bind_param("iii", $privacy, $limit_skip, $limit);
-    $stmt->bind_result($filename_db, $alttext_db, $firstname_db, $lastname_db);
+    $stmt->bind_result($id_db, $filename_db, $alttext_db, $firstname_db, $lastname_db);
     $stmt->execute();
 
     $img_html = null;
 
     while ($stmt->fetch()) {
-        # <img src="pildi url" alt="alteranatiivtekst">
+        # <img src="pildi url" alt="alteranatiivtekst" data-filename="pilt.jpg" data-id="35" class="thumbs">
 
         $img_html .= '<div class="thumbgallery">' ."\n";
 
@@ -62,6 +62,7 @@ function read_public_photo_thumbs($privacy, $page, $limit) {
         }
 
         $img_html .= '<img src="' .$GLOBALS["thumbnail_upload_location"] .$filename_db .'" alt="' .$alttext .'" ';
+        $img_html .= 'data-filename="' .$filename_db .'" data-id="' .$id_db .'" ';
         $img_html .= 'class="thumbs">' ."\n";
         $img_html .= "<p>" .$firstname_db ." " .$lastname_db ."</p>\n";
         $img_html .= "</div>\n";

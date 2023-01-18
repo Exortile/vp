@@ -42,11 +42,15 @@ $_SESSION["user_txt_color"] = $txtcolor;
 require_once "header.php";
 
 $nimi_html = "<p>Sisse logitud: " .$_SESSION["firstname"] ." " .$_SESSION["lastname"] ."</p>";
+$profiilipilt_html = "<p>Teie kena profiilipilt:</p>\n" .read_user_profile_photo($_SESSION["user_id"], $_SESSION["firstname"], $_SESSION["lastname"]);
 
 ?>
 
 <hr>
-<?php echo $nimi_html; ?>
+<?php 
+echo $nimi_html; 
+echo $profiilipilt_html;
+?>
 
 <ul>
 	<li><a href="?logout=1">Logi välja</a></li>

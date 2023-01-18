@@ -64,3 +64,25 @@ function write_user_profile($userid, $description, $bgcolor, $txtcolor) {
     $stmt->close();
     $db_connection->close();
 }
+
+function read_user_profile_photo($userid, $firstname, $lastname) {
+    $img_html = null;
+
+    $db_connection = connect_db();
+
+    $stmt = $db_connection->prepare("SELECT filename FROM vp_userprofilephotos WHERE userid = ?");
+    echo $db_connection->error;
+
+    $stmt->bind_param("i", $userid);
+    $stmt->bind_result($filename_db);
+    $stmt->execute();
+
+    if ($stmt->fetch()) {
+        $img_html .= '<img src="' .$GLOBALS["profile_photo_upload_location"] .$filename_db .'" alt="' .$firstname ." " .$lastname ." profiilipilt" .'">' ."\n";
+    }
+
+    $stmt->close();
+    $db_connection->close();
+
+    return $img_html;
+}

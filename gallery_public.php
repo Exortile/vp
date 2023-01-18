@@ -69,7 +69,9 @@ if (!isset($_GET["page"]) or $_GET["page"] < 1) {
     $page = $_GET["page"];
 }
 
-$style_sheets = ["style/gallery.css"];
+$style_sheets = ["style/gallery.css", "style/modal.css"];
+
+$javascripts = ["javascript/modal.js"];
 
 require_once "header.php";
 
@@ -86,6 +88,27 @@ $nimi_html = "<p>Sisse logitud: " .$_SESSION["firstname"] ." " .$_SESSION["lastn
 </ul>
 
 <hr>
+
+<dialog id="modal" class="modalarea">
+    <span id="modalclose" class="modalclose">&times;</span>
+    <div class="modalhorizontal">
+        <div class="modalvertical">
+            <p id="modalcaption"></p>
+            <img id="modalimage" src="pics/wrong.png" alt="galeriipilt">
+            <br>
+            <input id="rate1" name="rating" type="radio" value="1"><label for="rate1">1</label>
+            <input id="rate2" name="rating" type="radio" value="2"><label for="rate2">2</label>
+            <input id="rate3" name="rating" type="radio" value="3"><label for="rate3">3</label>
+            <input id="rate4" name="rating" type="radio" value="4"><label for="rate4">4</label>
+            <input id="rate5" name="rating" type="radio" value="5"><label for="rate5">5</label>
+            <button id="storeRating" type="button">Salvesta hinne</button>
+            <br>
+            <p id="avgrating"></p>
+        </div>
+    </div>
+</dialog>
+
+<h2>Galerii</h2>
 
 <p>
 <?php

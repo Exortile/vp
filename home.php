@@ -1,5 +1,8 @@
 <?php
 
+require_once "../../config.php";
+require_once "fnc_user_profile.php";
+
 require_once "classes/SessionManager.class.php";
 SessionManager::sessionStart("vp", 0, "/~pransten/vp/", "greeny.cs.tlu.ee");
 
@@ -23,6 +26,7 @@ if (isset($_COOKIE["lastvisitor"]) and !empty($_COOKIE["lastvisitor"])) {
 	$last_visitor = $_COOKIE["lastvisitor"];
 }
 
+
 // küpsised, enne veebilehe algust
 
 // cookie nimi, väärtus, aegumine sekundites, kataloog serveris, domeen, kas https, kas juurdepääs ainult üle veebi
@@ -36,6 +40,7 @@ require_once "header.php";
 
 $nimi_html = "<p>Sisse logitud: " .$_SESSION["firstname"] ." " .$_SESSION["lastname"] ."</p>";
 $kulastaja_html = "<p>Viimane külastaja: " .$last_visitor ."</p>";
+$profiilipilt_html = "<p>Teie kena profiilipilt:</p>\n" .read_user_profile_photo($_SESSION["user_id"], $_SESSION["firstname"], $_SESSION["lastname"]);
 
 ?>
 
@@ -43,11 +48,13 @@ $kulastaja_html = "<p>Viimane külastaja: " .$last_visitor ."</p>";
 <?php 
 echo $nimi_html; 
 echo $kulastaja_html;
+echo $profiilipilt_html;
 ?>
 
 <ul>
 	<li><a href="?logout=1">Logi välja</a></li>
 	<li><a href="user_profile.php">Lappa oma profiili</a></li>
+	<li><a href="user_profile_photo.php">Lappa oma profiilipilti</a></li>
 	<li><a href="read_film.php">Filmide lapang</a></li>
 	<li><a href="write_film.php">Filmide lisamine</a></li>
 	<li><a href="gallery_photo_upload.php">Fotode üleslaadimine</a></li>
